@@ -8,11 +8,10 @@ export default function Home() {
           Tony DeGregorio
         </h1>
         <p className="text-2xl text-blue-400 font-medium mb-6">
-          Senior Salesforce Architect
+          Salesforce Architect
         </p>
         <p className="text-slate-400 text-lg max-w-xl leading-relaxed">
-          Building enterprise-grade Salesforce solutions — Agentforce, Flow
-          automation, and platform architecture that scales.
+          Architecting Salesforce platforms that scale.
         </p>
       </section>
 
