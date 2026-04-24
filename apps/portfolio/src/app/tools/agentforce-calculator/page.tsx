@@ -24,14 +24,13 @@ const TYPE_HELP: Record<ActionType, string> = {
     "Enter a custom credit value for negotiated rates or future action types",
 };
 
-function creditsForType(type: ActionType, sandbox: boolean): number {
-  if (type === "standard") return sandbox ? 16 : STANDARD_CREDITS;
-  if (type === "voice") return sandbox ? 24 : VOICE_CREDITS;
+function creditsForType(type: ActionType): number {
+  if (type === "standard") return STANDARD_CREDITS;
+  if (type === "voice") return VOICE_CREDITS;
   return 0;
 }
 
 export default function AgentforceCalculator() {
-  const [isSandbox, setIsSandbox] = useState(false);
   const [actions, setActions] = useState<Action[]>([
     { name: "New Action", type: "standard", credits: STANDARD_CREDITS },
   ]);
@@ -41,24 +40,13 @@ export default function AgentforceCalculator() {
   const [costPerPack, setCostPerPack] = useState(BASE_PRICE);
   const [discount, setDiscount] = useState(0);
 
-  const toggleSandbox = (sandbox: boolean) => {
-    setIsSandbox(sandbox);
-    setActions((prev) =>
-      prev.map((a) =>
-        a.type === "custom"
-          ? a
-          : { ...a, credits: creditsForType(a.type, sandbox) }
-      )
-    );
-  };
-
   const addAction = () => {
     setActions((prev) => [
       ...prev,
       {
         name: "New Action",
         type: "standard",
-        credits: creditsForType("standard", isSandbox),
+        credits: creditsForType("standard"),
       },
     ]);
   };
@@ -78,7 +66,7 @@ export default function AgentforceCalculator() {
       prev.map((a, idx) => {
         if (idx !== i) return a;
         const credits =
-          type === "custom" ? a.credits : creditsForType(type, isSandbox);
+          type === "custom" ? a.credits : creditsForType(type);
         return { ...a, type, credits };
       })
     );
@@ -143,46 +131,13 @@ export default function AgentforceCalculator() {
       <p className="text-slate-400 mb-4 text-lg">
         Estimate annual Salesforce Agentforce flex credit cost for any use case
       </p>
-      <p className="text-slate-400 text-sm max-w-2xl mb-6 leading-relaxed">
+      <p className="text-slate-400 text-sm max-w-2xl mb-10 leading-relaxed">
         Agentforce flex credits are the currency that powers AI agent
         interactions in Salesforce. Each agent action consumes a configurable
         number of credits, and your total spend depends on dataset size,
         interaction frequency, and which actions your agents perform. Use this
         tool to size a credit pack purchase before going to contract.
       </p>
-
-      {/* Production / Sandbox toggle */}
-      <div className="flex items-center gap-3 mb-8 flex-wrap">
-        <span className="text-sm font-medium text-slate-300">Environment:</span>
-        <div className="flex rounded-lg overflow-hidden border border-slate-600">
-          <button
-            onClick={() => toggleSandbox(false)}
-            className={`px-4 py-1.5 text-sm font-medium transition-colors ${
-              !isSandbox
-                ? "bg-blue-600 text-white"
-                : "bg-slate-800 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            Production
-          </button>
-          <button
-            onClick={() => toggleSandbox(true)}
-            className={`px-4 py-1.5 text-sm font-medium transition-colors ${
-              isSandbox
-                ? "bg-amber-600 text-white"
-                : "bg-slate-800 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            Sandbox
-          </button>
-        </div>
-        {isSandbox && (
-          <span className="text-xs text-amber-400">
-            Sandbox mode: 80% credit multiplier active (standard: 16 cr, voice:
-            24 cr)
-          </span>
-        )}
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Agent Actions */}
