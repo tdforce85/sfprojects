@@ -1,80 +1,79 @@
 "use client";
 
-import { useState } from "react";
-
-const BASE_PRICE = 500;
-const CREDITS_PER_PACK = 100_000;
+import { useRef, useState } from "react";
+import { AGENTFORCE_PRICING, MAX_DISCOUNT_PRICE } from "@/lib/pricing";
 
 interface Action {
+  id: string;
   name: string;
-  credits: number;
 }
 
 export default function AgentforceCalculator() {
   const [actions, setActions] = useState<Action[]>([
-    { name: "New Action", credits: 20 },
+    { id: "initial", name: "New Action" },
   ]);
   const [rateCardCost, setRateCardCost] = useState(20);
   const [datasetSize, setDatasetSize] = useState(1000);
   const [interactionsPerMonth, setInteractionsPerMonth] = useState(1);
   const [devOverhead, setDevOverhead] = useState(15);
-  const [costPerPack, setCostPerPack] = useState(BASE_PRICE);
+  const [costPerPack, setCostPerPack] = useState<number>(
+    AGENTFORCE_PRICING.basePricePerPack
+  );
   const [discount, setDiscount] = useState(0);
-
-  const updateRateCard = (rate: number) => {
-    setRateCardCost(rate);
-    setActions((prev) => prev.map((a) => ({ ...a, credits: rate })));
-  };
+  const nextIdRef = useRef(1);
 
   const addAction = () => {
     setActions((prev) => [
       ...prev,
-      { name: "New Action", credits: rateCardCost },
+      { id: `a${nextIdRef.current++}`, name: "New Action" },
     ]);
   };
 
-  const removeAction = (i: number) => {
-    setActions((prev) => prev.filter((_, idx) => idx !== i));
+  const removeAction = (id: string) => {
+    setActions((prev) => prev.filter((a) => a.id !== id));
   };
 
-  const updateActionName = (i: number, name: string) => {
+  const updateActionName = (id: string, name: string) => {
     setActions((prev) =>
-      prev.map((a, idx) => (idx === i ? { ...a, name } : a))
+      prev.map((a) => (a.id === id ? { ...a, name } : a))
     );
   };
 
   const syncFromDiscount = (d: number) => {
     setDiscount(d);
-    setCostPerPack(+(BASE_PRICE * (1 - d / 100)).toFixed(2));
+    setCostPerPack(
+      +(AGENTFORCE_PRICING.basePricePerPack * (1 - d / 100)).toFixed(2)
+    );
   };
 
   const syncFromPrice = (price: number) => {
-    const maxDiscountPrice = BASE_PRICE * 0.25;
-    if (price < maxDiscountPrice) {
-      setDiscount(75);
-      setCostPerPack(maxDiscountPrice);
-    } else if (price > BASE_PRICE) {
+    if (price < MAX_DISCOUNT_PRICE) {
+      setDiscount(AGENTFORCE_PRICING.maxDiscountPercent);
+      setCostPerPack(MAX_DISCOUNT_PRICE);
+    } else if (price > AGENTFORCE_PRICING.basePricePerPack) {
       setDiscount(0);
-      setCostPerPack(BASE_PRICE);
+      setCostPerPack(AGENTFORCE_PRICING.basePricePerPack);
     } else {
-      setDiscount(Math.max(0, Math.round((1 - price / BASE_PRICE) * 100)));
+      setDiscount(
+        Math.max(
+          0,
+          Math.round((1 - price / AGENTFORCE_PRICING.basePricePerPack) * 100)
+        )
+      );
       setCostPerPack(price);
     }
   };
 
-  const creditsPerInteraction = actions.reduce(
-    (s, a) => s + (a.credits || 0),
-    0
-  );
+  const creditsPerInteraction = actions.length * rateCardCost;
   const monthly = datasetSize * interactionsPerMonth * creditsPerInteraction;
   const annual = monthly * 12;
   const devCredits = Math.round((annual * devOverhead) / 100);
   const totalCredits = annual + devCredits;
-  const packs = totalCredits / CREDITS_PER_PACK;
-  const effectivePrice = Math.max(costPerPack, BASE_PRICE * 0.25);
+  const packs = totalCredits / AGENTFORCE_PRICING.creditsPerPack;
+  const effectivePrice = Math.max(costPerPack, MAX_DISCOUNT_PRICE);
   const totalCost = packs * effectivePrice;
-  const listCost = packs * BASE_PRICE;
-  const atMaxDiscount = discount >= 75;
+  const listCost = packs * AGENTFORCE_PRICING.basePricePerPack;
+  const atMaxDiscount = discount >= AGENTFORCE_PRICING.maxDiscountPercent;
 
   const fmt = (n: number) =>
     n.toLocaleString("en-US", { maximumFractionDigits: 0 });
@@ -109,18 +108,22 @@ export default function AgentforceCalculator() {
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
           <h2 className="text-xl font-semibold mb-4">Agent Actions</h2>
 
-          <label className="block text-sm text-slate-400 mb-1">
-            Cost Per Action
+          <label
+            htmlFor="credits-per-action"
+            className="block text-sm text-slate-400 mb-1"
+          >
+            Credits per action
           </label>
           <input
+            id="credits-per-action"
             type="text"
             inputMode="numeric"
             value={rateCardCost}
-            onChange={(e) => updateRateCard(parseInt(e.target.value) || 0)}
+            onChange={(e) => setRateCardCost(parseInt(e.target.value) || 0)}
             className={inputClass + " mb-2"}
           />
           <a
-            href="https://www.salesforce.com/agentforce/rates/"
+            href={AGENTFORCE_PRICING.rateCardUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-400 hover:text-blue-300 text-sm underline block mb-4"
@@ -132,31 +135,25 @@ export default function AgentforceCalculator() {
             <thead>
               <tr className="text-slate-400 border-b border-slate-700">
                 <th className="text-left pb-2 font-medium">Action Name</th>
-                <th className="text-right pb-2 pr-2 font-medium">Credits</th>
                 <th className="pb-2 w-6"></th>
               </tr>
             </thead>
             <tbody>
-              {actions.map((action, i) => (
-                <tr key={i} className="border-b border-slate-700/40">
+              {actions.map((action) => (
+                <tr key={action.id} className="border-b border-slate-700/40">
                   <td className="py-1.5 pr-2">
                     <input
+                      aria-label="Action name"
                       value={action.name}
-                      onChange={(e) => updateActionName(i, e.target.value)}
+                      onChange={(e) =>
+                        updateActionName(action.id, e.target.value)
+                      }
                       className="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-100 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </td>
-                  <td className="py-1.5 pr-2">
-                    <input
-                      type="number"
-                      value={action.credits}
-                      readOnly
-                      className="w-20 bg-slate-900/50 border border-slate-700 rounded px-2 py-1 text-slate-500 text-sm text-right cursor-not-allowed"
                     />
                   </td>
                   <td className="py-1.5">
                     <button
-                      onClick={() => removeAction(i)}
+                      onClick={() => removeAction(action.id)}
                       aria-label="Remove action"
                       className="text-slate-500 hover:text-red-400 transition-colors px-1 leading-none"
                     >
@@ -187,10 +184,14 @@ export default function AgentforceCalculator() {
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
           <h2 className="text-xl font-semibold mb-4">Monthly Usage Estimate</h2>
 
-          <label className="block text-sm text-slate-400 mb-1">
+          <label
+            htmlFor="dataset-size"
+            className="block text-sm text-slate-400 mb-1"
+          >
             Dataset size (total records)
           </label>
           <input
+            id="dataset-size"
             type="text"
             inputMode="numeric"
             value={datasetSize}
@@ -198,21 +199,31 @@ export default function AgentforceCalculator() {
             className={inputClass + " mb-4"}
           />
 
-          <label className="block text-sm text-slate-400 mb-1">
+          <label
+            htmlFor="interactions-per-month"
+            className="block text-sm text-slate-400 mb-1"
+          >
             Interactions per record per month
           </label>
           <input
+            id="interactions-per-month"
             type="text"
             inputMode="numeric"
             value={interactionsPerMonth}
-            onChange={(e) => setInteractionsPerMonth(parseInt(e.target.value) || 0)}
+            onChange={(e) =>
+              setInteractionsPerMonth(parseInt(e.target.value) || 0)
+            }
             className={inputClass + " mb-4"}
           />
 
-          <label className="block text-sm text-slate-400 mb-1">
+          <label
+            htmlFor="dev-overhead"
+            className="block text-sm text-slate-400 mb-1"
+          >
             Dev / sandbox overhead %
           </label>
           <input
+            id="dev-overhead"
             type="text"
             inputMode="numeric"
             value={devOverhead}
@@ -225,20 +236,28 @@ export default function AgentforceCalculator() {
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
           <h2 className="text-xl font-semibold mb-4">Pricing</h2>
 
-          <label className="block text-sm text-slate-400 mb-1">
+          <label
+            htmlFor="credits-per-pack"
+            className="block text-sm text-slate-400 mb-1"
+          >
             Credits per pack
           </label>
           <input
+            id="credits-per-pack"
             type="number"
-            value={CREDITS_PER_PACK}
+            value={AGENTFORCE_PRICING.creditsPerPack}
             disabled
             className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 mb-4 text-slate-500 cursor-not-allowed"
           />
 
-          <label className="block text-sm text-slate-400 mb-1">
+          <label
+            htmlFor="cost-per-pack"
+            className="block text-sm text-slate-400 mb-1"
+          >
             List price per pack ($)
           </label>
           <input
+            id="cost-per-pack"
             type="text"
             inputMode="decimal"
             value={costPerPack}
@@ -246,22 +265,26 @@ export default function AgentforceCalculator() {
             className={inputClass + " mb-4"}
           />
 
-          <label className="block text-sm text-slate-400 mb-1">
+          <label
+            htmlFor="volume-discount"
+            className="block text-sm text-slate-400 mb-1"
+          >
             Volume discount:{" "}
             <span className="text-slate-100 font-medium">{discount}%</span>
           </label>
           <input
+            id="volume-discount"
             type="range"
             min={0}
-            max={75}
+            max={AGENTFORCE_PRICING.maxDiscountPercent}
             value={discount}
             onChange={(e) => syncFromDiscount(+e.target.value)}
             className="w-full accent-blue-500"
           />
           {atMaxDiscount && (
             <p className="text-amber-400 text-xs mt-2">
-              Maximum 75% discount applied. Contact Salesforce for pricing
-              beyond this level.
+              Maximum {AGENTFORCE_PRICING.maxDiscountPercent}% discount applied.
+              Contact Salesforce for pricing beyond this level.
             </p>
           )}
         </div>
