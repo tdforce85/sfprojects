@@ -43,12 +43,6 @@ export default function AgentforceCalculator() {
     );
   };
 
-  const updateActionCredits = (i: number, credits: number) => {
-    setActions((prev) =>
-      prev.map((a, idx) => (idx === i ? { ...a, credits } : a))
-    );
-  };
-
   const syncFromDiscount = (d: number) => {
     setDiscount(d);
     setCostPerPack(+(BASE_PRICE * (1 - d / 100)).toFixed(2));
@@ -156,11 +150,8 @@ export default function AgentforceCalculator() {
                     <input
                       type="number"
                       value={action.credits}
-                      min={0}
-                      onChange={(e) =>
-                        updateActionCredits(i, +e.target.value || 0)
-                      }
-                      className="w-20 bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-100 text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      readOnly
+                      className="w-20 bg-slate-900/50 border border-slate-700 rounded px-2 py-1 text-slate-500 text-sm text-right cursor-not-allowed"
                     />
                   </td>
                   <td className="py-1.5">
