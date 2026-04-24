@@ -43,12 +43,6 @@ export default function AgentforceCalculator() {
     );
   };
 
-  const updateActionCredits = (i: number, credits: number) => {
-    setActions((prev) =>
-      prev.map((a, idx) => (idx === i ? { ...a, credits } : a))
-    );
-  };
-
   const syncFromDiscount = (d: number) => {
     setDiscount(d);
     setCostPerPack(+(BASE_PRICE * (1 - d / 100)).toFixed(2));
@@ -119,10 +113,10 @@ export default function AgentforceCalculator() {
             Cost Per Action
           </label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={rateCardCost}
-            min={0}
-            onChange={(e) => updateRateCard(+e.target.value || 0)}
+            onChange={(e) => updateRateCard(parseInt(e.target.value) || 0)}
             className={inputClass + " mb-2"}
           />
           <a
@@ -156,11 +150,8 @@ export default function AgentforceCalculator() {
                     <input
                       type="number"
                       value={action.credits}
-                      min={0}
-                      onChange={(e) =>
-                        updateActionCredits(i, +e.target.value || 0)
-                      }
-                      className="w-20 bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-100 text-sm text-right focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      readOnly
+                      className="w-20 bg-slate-900/50 border border-slate-700 rounded px-2 py-1 text-slate-500 text-sm text-right cursor-not-allowed"
                     />
                   </td>
                   <td className="py-1.5">
@@ -200,10 +191,10 @@ export default function AgentforceCalculator() {
             Dataset size (total records)
           </label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={datasetSize}
-            min={0}
-            onChange={(e) => setDatasetSize(+e.target.value || 0)}
+            onChange={(e) => setDatasetSize(parseInt(e.target.value) || 0)}
             className={inputClass + " mb-4"}
           />
 
@@ -211,11 +202,10 @@ export default function AgentforceCalculator() {
             Interactions per record per month
           </label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={interactionsPerMonth}
-            min={0}
-            step={1}
-            onChange={(e) => setInteractionsPerMonth(+e.target.value || 0)}
+            onChange={(e) => setInteractionsPerMonth(parseInt(e.target.value) || 0)}
             className={inputClass + " mb-4"}
           />
 
@@ -223,11 +213,10 @@ export default function AgentforceCalculator() {
             Dev / sandbox overhead %
           </label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={devOverhead}
-            min={0}
-            max={100}
-            onChange={(e) => setDevOverhead(+e.target.value || 0)}
+            onChange={(e) => setDevOverhead(parseInt(e.target.value) || 0)}
             className={inputClass}
           />
         </div>
@@ -250,11 +239,10 @@ export default function AgentforceCalculator() {
             List price per pack ($)
           </label>
           <input
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={costPerPack}
-            min={0}
-            step={0.01}
-            onChange={(e) => syncFromPrice(+e.target.value || 0)}
+            onChange={(e) => syncFromPrice(parseFloat(e.target.value) || 0)}
             className={inputClass + " mb-4"}
           />
 
