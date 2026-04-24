@@ -1,0 +1,35 @@
+import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Tools | Tony DeGregorio",
+};
+
+export default function Tools() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h1 className="text-4xl font-bold mb-3">Tools</h1>
+      <p className="text-slate-400 mb-10 text-lg">
+        Calculators and utilities for Salesforce architects.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Link
+          href="/tools/agentforce-calculator"
+          className="group block bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-blue-500 transition-all"
+        >
+          <div className="text-blue-400 text-sm font-medium mb-2 uppercase tracking-wide">
+            Agentforce
+          </div>
+          <h3 className="text-lg font-semibold text-slate-100 mb-2 group-hover:text-white transition-colors">
+            Flex Credit Calculator
+          </h3>
+          <p className="text-slate-400 text-sm leading-relaxed">
+            Estimate annual Agentforce flex credit costs by dataset size,
+            interaction frequency, and action mix.
+          </p>
+        </Link>
+      </div>
+    </div>
+  );
+}
