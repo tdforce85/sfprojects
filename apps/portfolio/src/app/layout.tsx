@@ -46,7 +46,7 @@ export default function RootLayout({
             <span>© 2026 Tony DeGregorio</span>
             <div className="flex gap-4">
               <a
-                href="https://github.com/tonydegregorio"
+                href="https://github.com/tdforce85"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-slate-300 transition-colors"
