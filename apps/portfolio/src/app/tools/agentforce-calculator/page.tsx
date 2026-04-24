@@ -139,6 +139,10 @@ export default function AgentforceCalculator() {
         tool to size a credit pack purchase before going to contract.
       </p>
 
+      <div className="flex items-center gap-2 mb-8 px-4 py-2.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-amber-300/80 text-sm">
+        🔨 Completion: <code className="font-mono">NaN%</code> — this tool is still figuring itself out, much like the rest of us.
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Agent Actions */}
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
