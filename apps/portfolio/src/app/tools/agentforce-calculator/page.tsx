@@ -3,16 +3,37 @@
 import { useRef, useState } from "react";
 import { AGENTFORCE_PRICING, MAX_DISCOUNT_PRICE } from "@/lib/pricing";
 
+const STANDARD_CREDITS = 20;
+const VOICE_CREDITS = 30;
+
+type ActionType = "standard" | "voice" | "custom";
+
 interface Action {
   id: string;
   name: string;
+  type: ActionType;
+  credits: number;
+}
+
+const TYPE_HELP: Record<ActionType, string> = {
+  standard:
+    "Most agent actions: query records, create/update records, run flows, search knowledge, call Apex, send emails, execute prompts",
+  voice:
+    "Actions during Agentforce Voice calls. Higher credit cost due to speech-to-text and text-to-speech processing. Note: orgs choose either Voice Actions or Voice Minutes metering — they cannot be combined",
+  custom:
+    "Enter a custom credit value for negotiated rates or future action types",
+};
+
+function creditsForType(type: ActionType): number {
+  if (type === "standard") return STANDARD_CREDITS;
+  if (type === "voice") return VOICE_CREDITS;
+  return 0;
 }
 
 export default function AgentforceCalculator() {
   const [actions, setActions] = useState<Action[]>([
-    { id: "initial", name: "New Action" },
+    { id: "initial", name: "New Action", type: "standard", credits: STANDARD_CREDITS },
   ]);
-  const [rateCardCost, setRateCardCost] = useState(20);
   const [datasetSize, setDatasetSize] = useState(1000);
   const [interactionsPerMonth, setInteractionsPerMonth] = useState(1);
   const [devOverhead, setDevOverhead] = useState(15);
@@ -25,7 +46,12 @@ export default function AgentforceCalculator() {
   const addAction = () => {
     setActions((prev) => [
       ...prev,
-      { id: `a${nextIdRef.current++}`, name: "New Action" },
+      {
+        id: `a${nextIdRef.current++}`,
+        name: "New Action",
+        type: "standard",
+        credits: creditsForType("standard"),
+      },
     ]);
   };
 
@@ -36,6 +62,22 @@ export default function AgentforceCalculator() {
   const updateActionName = (id: string, name: string) => {
     setActions((prev) =>
       prev.map((a) => (a.id === id ? { ...a, name } : a))
+    );
+  };
+
+  const updateActionType = (id: string, type: ActionType) => {
+    setActions((prev) =>
+      prev.map((a) => {
+        if (a.id !== id) return a;
+        const credits = type === "custom" ? a.credits : creditsForType(type);
+        return { ...a, type, credits };
+      })
+    );
+  };
+
+  const updateActionCredits = (id: string, credits: number) => {
+    setActions((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, credits } : a))
     );
   };
 
@@ -64,7 +106,10 @@ export default function AgentforceCalculator() {
     }
   };
 
-  const creditsPerInteraction = actions.length * rateCardCost;
+  const creditsPerInteraction = actions.reduce(
+    (s, a) => s + (a.credits || 0),
+    0
+  );
   const monthly = datasetSize * interactionsPerMonth * creditsPerInteraction;
   const annual = monthly * 12;
   const devCredits = Math.round((annual * devOverhead) / 100);
@@ -103,25 +148,15 @@ export default function AgentforceCalculator() {
         tool to size a credit pack purchase before going to contract.
       </p>
 
+      <div className="flex items-center gap-2 mb-8 px-4 py-2.5 rounded-lg bg-amber-950/40 border border-amber-800/50 text-amber-300/80 text-sm">
+        🔨 Completion: <code className="font-mono">NaN%</code> — this tool is still figuring itself out, much like the rest of us.
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Agent Actions */}
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
           <h2 className="text-xl font-semibold mb-4">Agent Actions</h2>
 
-          <label
-            htmlFor="credits-per-action"
-            className="block text-sm text-slate-400 mb-1"
-          >
-            Credits per action
-          </label>
-          <input
-            id="credits-per-action"
-            type="text"
-            inputMode="numeric"
-            value={rateCardCost}
-            onChange={(e) => setRateCardCost(parseInt(e.target.value) || 0)}
-            className={inputClass + " mb-2"}
-          />
           <a
             href={AGENTFORCE_PRICING.rateCardUrl}
             target="_blank"
@@ -131,46 +166,76 @@ export default function AgentforceCalculator() {
             Agentforce Rate Card ↗
           </a>
 
-          <table className="w-full text-sm mb-3">
-            <thead>
-              <tr className="text-slate-400 border-b border-slate-700">
-                <th className="text-left pb-2 font-medium">Action Name</th>
-                <th className="pb-2 w-6"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {actions.map((action) => (
-                <tr key={action.id} className="border-b border-slate-700/40">
-                  <td className="py-1.5 pr-2">
-                    <input
-                      aria-label="Action name"
-                      value={action.name}
-                      onChange={(e) =>
-                        updateActionName(action.id, e.target.value)
-                      }
-                      className="w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-100 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </td>
-                  <td className="py-1.5">
-                    <button
-                      onClick={() => removeAction(action.id)}
-                      aria-label="Remove action"
-                      className="text-slate-500 hover:text-red-400 transition-colors px-1 leading-none"
-                    >
-                      ✕
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="space-y-3 mb-3">
+            {actions.map((action) => (
+              <div
+                key={action.id}
+                className="border border-slate-700/60 rounded-lg p-3 space-y-2"
+              >
+                <div className="flex items-start gap-2">
+                  <input
+                    aria-label="Action name"
+                    value={action.name}
+                    onChange={(e) => updateActionName(action.id, e.target.value)}
+                    placeholder="e.g. Look up account"
+                    className="flex-1 bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-100 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  <button
+                    onClick={() => removeAction(action.id)}
+                    aria-label="Remove action"
+                    className="text-slate-500 hover:text-red-400 transition-colors px-1 leading-none mt-1 shrink-0"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={action.type}
+                    onChange={(e) =>
+                      updateActionType(action.id, e.target.value as ActionType)
+                    }
+                    className="flex-1 bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-100 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="standard">Standard Action</option>
+                    <option value="voice">Voice Action</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                  <input
+                    type="number"
+                    value={action.credits}
+                    readOnly={action.type !== "custom"}
+                    onChange={(e) =>
+                      action.type === "custom" &&
+                      updateActionCredits(action.id, parseInt(e.target.value) || 0)
+                    }
+                    className={`w-16 border rounded px-2 py-1 text-sm text-right ${
+                      action.type === "custom"
+                        ? "bg-slate-900 border-slate-600 text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        : "bg-slate-900/50 border-slate-700 text-slate-400 cursor-not-allowed"
+                    }`}
+                  />
+                  <span className="text-xs text-slate-500 shrink-0">cr</span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  {TYPE_HELP[action.type]}
+                </p>
+              </div>
+            ))}
+          </div>
 
           <button
             onClick={addAction}
-            className="text-blue-400 hover:text-blue-300 text-sm transition-colors mb-4"
+            className="text-blue-400 hover:text-blue-300 text-sm transition-colors mb-3 block"
           >
             + Add Action
           </button>
+
+          <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+            Each action in your agent&apos;s topic configuration consumes
+            credits independently. An agent that queries a record, searches
+            knowledge, and sends an email = 3 standard actions = 60 credits per
+            interaction.
+          </p>
 
           <div className="text-sm text-slate-300 border-t border-slate-700 pt-3">
             Credits per interaction:{" "}
@@ -330,30 +395,36 @@ export default function AgentforceCalculator() {
             </div>
             <div className="text-2xl font-bold">{packs.toFixed(2)}</div>
           </div>
-          <div>
-            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-              List cost
-            </div>
-            <div className="text-2xl font-bold text-slate-500 line-through">
-              {fmtUSD(listCost)}
-            </div>
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-              Discounted cost
-              {discount > 0 && (
-                <span className="text-green-400 ml-1">({discount}% off)</span>
-              )}
-            </div>
-            <div className="text-2xl font-bold text-green-400">
-              {fmtUSD(totalCost)}
-            </div>
-            {discount === 0 && (
-              <div className="text-xs text-slate-500 mt-1">
-                No discount applied
+          {discount > 0 ? (
+            <>
+              <div>
+                <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+                  List cost
+                </div>
+                <div className="text-2xl font-bold text-slate-500 line-through">
+                  {fmtUSD(listCost)}
+                </div>
               </div>
-            )}
-          </div>
+              <div>
+                <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+                  Discounted cost
+                  <span className="text-green-400 ml-1">({discount}% off)</span>
+                </div>
+                <div className="text-2xl font-bold text-green-400">
+                  {fmtUSD(totalCost)}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="sm:col-span-2">
+              <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+                Estimated annual cost
+              </div>
+              <div className="text-2xl font-bold text-green-400">
+                {fmtUSD(totalCost)}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
