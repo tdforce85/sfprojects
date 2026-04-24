@@ -11,12 +11,11 @@ sfprojects/
 │   └── portfolio/               # Next.js — tonydegregorio.com
 │       ├── src/
 │       │   ├── app/             # App Router pages
-│       │   ├── components/      # UI components
+│       │   ├── components/      # UI components (future)
 │       │   └── lib/             # Utilities, types, constants
 │       ├── public/
 │       ├── package.json
-│       ├── next.config.js
-│       └── wrangler.toml        # Cloudflare Workers config
+│       └── next.config.ts
 ├── packages/                    # Shared libraries (future)
 ├── sandbox/                     # POCs, experiments, throwaway
 ├── docs/                        # Architecture notes, blog drafts
@@ -25,11 +24,11 @@ sfprojects/
 ```
 
 ## Tech Stack (Portfolio)
-- **Framework**: Next.js 14+ (App Router)
-- **Deployment**: Cloudflare Workers via `@cloudflare/next-on-pages`
-- **Styling**: Tailwind CSS
+- **Framework**: Next.js 15 (App Router)
+- **Deployment**: Cloudflare Pages, static export via `output: 'export'`
+- **Styling**: Tailwind CSS v4 (CSS-based `@theme`, no config file)
 - **Language**: TypeScript (strict mode)
-- **Package manager**: npm (with workspaces)
+- **Package manager**: npm (single app; no root workspace yet)
 
 ## Conventions
 
