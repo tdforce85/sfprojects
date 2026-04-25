@@ -30,12 +30,20 @@ export default function RootLayout({
             >
               Tony DeGregorio
             </Link>
-            <Link
-              href="/tools"
-              className="text-slate-400 hover:text-slate-100 text-sm transition-colors"
-            >
-              Tools
-            </Link>
+            <div className="flex items-center gap-6">
+              <Link
+                href="/tools"
+                className="text-slate-400 hover:text-slate-100 text-sm transition-colors"
+              >
+                Tools
+              </Link>
+              <Link
+                href="/how-its-built"
+                className="text-slate-400 hover:text-slate-100 text-sm transition-colors"
+              >
+                How It&apos;s Built
+              </Link>
+            </div>
           </nav>
         </header>
 
