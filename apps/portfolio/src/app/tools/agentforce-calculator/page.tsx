@@ -152,6 +152,79 @@ export default function AgentforceCalculator() {
         🔨 Completion: <code className="font-mono">NaN%</code> — this tool is still figuring itself out, much like the rest of us.
       </div>
 
+      {/* Results */}
+      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 mb-6">
+        <h2 className="text-xl font-semibold mb-6">Annual Estimate</h2>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div>
+            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+              Monthly credits
+            </div>
+            <div className="text-2xl font-bold">{fmt(monthly)}</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+              Annual (prod)
+            </div>
+            <div className="text-2xl font-bold">{fmt(annual)}</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+              Dev overhead ({devOverhead}%)
+            </div>
+            <div className="text-2xl font-bold">+{fmt(devCredits)}</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+              Total credits
+            </div>
+            <div className="text-2xl font-bold text-blue-400">
+              {fmt(totalCredits)}
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-700 pt-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div>
+            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+              Credit packs needed
+            </div>
+            <div className="text-2xl font-bold">{packs.toFixed(2)}</div>
+          </div>
+          {discount > 0 ? (
+            <>
+              <div>
+                <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+                  List cost
+                </div>
+                <div className="text-2xl font-bold text-slate-500 line-through">
+                  {fmtUSD(listCost)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+                  Discounted cost
+                  <span className="text-green-400 ml-1">({discount}% off)</span>
+                </div>
+                <div className="text-2xl font-bold text-green-400">
+                  {fmtUSD(totalCost)}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="sm:col-span-2">
+              <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
+                Estimated annual cost
+              </div>
+              <div className="text-2xl font-bold text-green-400">
+                {fmtUSD(totalCost)}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Agent Actions */}
         <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
@@ -355,78 +428,6 @@ export default function AgentforceCalculator() {
         </div>
       </div>
 
-      {/* Results */}
-      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-        <h2 className="text-xl font-semibold mb-6">Annual Estimate</h2>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <div>
-            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-              Monthly credits
-            </div>
-            <div className="text-2xl font-bold">{fmt(monthly)}</div>
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-              Annual (prod)
-            </div>
-            <div className="text-2xl font-bold">{fmt(annual)}</div>
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-              Dev overhead ({devOverhead}%)
-            </div>
-            <div className="text-2xl font-bold">+{fmt(devCredits)}</div>
-          </div>
-          <div>
-            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-              Total credits
-            </div>
-            <div className="text-2xl font-bold text-blue-400">
-              {fmt(totalCredits)}
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-slate-700 pt-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div>
-            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-              Credit packs needed
-            </div>
-            <div className="text-2xl font-bold">{packs.toFixed(2)}</div>
-          </div>
-          {discount > 0 ? (
-            <>
-              <div>
-                <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-                  List cost
-                </div>
-                <div className="text-2xl font-bold text-slate-500 line-through">
-                  {fmtUSD(listCost)}
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-                  Discounted cost
-                  <span className="text-green-400 ml-1">({discount}% off)</span>
-                </div>
-                <div className="text-2xl font-bold text-green-400">
-                  {fmtUSD(totalCost)}
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="sm:col-span-2">
-              <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">
-                Estimated annual cost
-              </div>
-              <div className="text-2xl font-bold text-green-400">
-                {fmtUSD(totalCost)}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
