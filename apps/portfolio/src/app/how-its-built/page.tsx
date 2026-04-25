@@ -11,7 +11,7 @@ export default function HowItsBuilt() {
       <p className="text-slate-400 text-lg leading-relaxed mb-16">
         This isn&apos;t a Squarespace site. Everything you see here is
         purpose-built — the portfolio site, the live Salesforce demos, and the
-        questionable decision to use 14 platform features for a contact form.
+        contact form that got a little out of hand.
       </p>
 
       <div className="space-y-14">

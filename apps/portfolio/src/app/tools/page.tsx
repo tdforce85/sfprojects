@@ -43,8 +43,8 @@ export default function Tools() {
             The Over-Engineered Lead Form
           </h3>
           <p className="text-slate-400 text-sm leading-relaxed">
-            A contact form that uses 14 platform features to save 2 fields.
-            Built on Experience Cloud LWR with custom LWC, Platform Events,
+            A contact form built with every Salesforce platform feature that
+            would fit. Experience Cloud LWR, custom LWC, Platform Events,
             Queueable Apex, and a runaway submit button.
           </p>
           <div className="mt-4 inline-block text-sm font-medium text-blue-400 group-hover:text-blue-300 transition-colors">
