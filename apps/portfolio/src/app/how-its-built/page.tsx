@@ -21,7 +21,7 @@ export default function HowItsBuilt() {
           </h2>
           <p className="text-slate-400 leading-relaxed">
             Next.js with App Router, TypeScript, and Tailwind CSS. Deployed to
-            Cloudflare Workers. Source code is public on GitHub because if
+            Cloudflare Pages. Source code is public on GitHub because if
             you&apos;re going to claim you can architect things, people should
             be able to check your work.
           </p>
