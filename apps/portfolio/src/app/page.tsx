@@ -37,7 +37,7 @@ export default function Home() {
           </Link>
 
           <a
-            href="https://bluemotionconsultingllc-dev-ed.develop.my.site.com/"
+            href="https://bluemotionconsultingllc-dev-ed.develop.my.site.com/the-over-engineered-lead-form"
             target="_blank"
             rel="noopener noreferrer"
             className="group block bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-blue-500 hover:bg-slate-800/80 transition-all"
@@ -52,6 +52,27 @@ export default function Home() {
               A contact form built with every Salesforce platform feature that would fit.
               Built on Experience Cloud LWR with custom LWC, Platform Events,
               Queueable Apex, and a runaway submit button.
+            </p>
+            <div className="mt-4 inline-block text-sm font-medium text-blue-400 group-hover:text-blue-300 transition-colors">
+              Try It Live →
+            </div>
+          </a>
+
+          <a
+            href="https://bluemotionconsultingllc-dev-ed.develop.my.site.com/error-handling-dashboard"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-blue-500 hover:bg-slate-800/80 transition-all"
+          >
+            <div className="text-blue-400 text-sm font-medium mb-2 uppercase tracking-wide">
+              Operations
+            </div>
+            <h3 className="text-lg font-semibold text-slate-100 mb-2 group-hover:text-white transition-colors">
+              Error Handling Dashboard
+            </h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Centralized view of platform errors and Flow faults for
+              triage and root-cause analysis.
             </p>
             <div className="mt-4 inline-block text-sm font-medium text-blue-400 group-hover:text-blue-300 transition-colors">
               Try It Live →
