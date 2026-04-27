@@ -31,7 +31,7 @@ export default function Tools() {
         </Link>
 
         <a
-          href="https://bluemotionconsultingllc-dev-ed.develop.my.site.com/"
+          href="https://bluemotionconsultingllc-dev-ed.develop.my.site.com/the-over-engineered-lead-form"
           target="_blank"
           rel="noopener noreferrer"
           className="group block bg-slate-800 border border-slate-700 rounded-xl p-6 hover:border-blue-500 transition-all"
