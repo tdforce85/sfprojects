@@ -98,6 +98,13 @@ describe("drawAssignments", () => {
     for (let i = 0; i < 1_000; i++) assertValid(FIXTURE, drawAssignments(FIXTURE));
   });
 
+  it("falls back to backtracking when sampling is skipped", () => {
+    const rng = mulberry32(555);
+    for (let i = 0; i < 2_000; i++) {
+      assertValid(FIXTURE, drawAssignments(FIXTURE, rng, 0));
+    }
+  });
+
   it("every allowed pair occurs at least once (20,000 draws)", () => {
     const rng = mulberry32(987);
     const seen = new Set<string>();

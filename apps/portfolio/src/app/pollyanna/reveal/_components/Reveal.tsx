@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { decodePayload } from "@/lib/pollyanna/token";
 import type { RevealPayload } from "@/lib/pollyanna/types";
 
@@ -58,6 +58,13 @@ function Present({ lidOff }: PresentProps) {
 
 function Gift({ payload }: GiftProps) {
   const [opened, setOpened] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // The present button unmounts on tap; move focus to the result so keyboard
+  // and screen-reader users land on it.
+  useEffect(() => {
+    if (opened) cardRef.current?.focus();
+  }, [opened]);
 
   return (
     <div className="relative flex flex-col items-center gap-6 text-center">
@@ -98,6 +105,8 @@ function Gift({ payload }: GiftProps) {
             </div>
           </div>
           <div
+            ref={cardRef}
+            tabIndex={-1}
             className="pollyanna-card pollyanna-pop p-6 w-full max-w-sm space-y-2"
             role="status"
           >

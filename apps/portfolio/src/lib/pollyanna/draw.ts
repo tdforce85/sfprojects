@@ -121,7 +121,14 @@ function backtrack(kids: Kid[], rng?: Rng): Kid[] | null {
   return kids.map((g) => byGiver.get(g) as Kid);
 }
 
-export function drawAssignments(families: Family[], rng?: Rng): Assignment[] {
+// Rejection sampling is uniform over valid draws. The backtracking fallback is
+// not, but it only runs if sampling exhausts maxAttempts, which does not happen
+// at family-sized rosters.
+export function drawAssignments(
+  families: Family[],
+  rng?: Rng,
+  maxAttempts: number = MAX_ATTEMPTS
+): Assignment[] {
   const validation = validateRoster(families);
   if (!validation.ok) throw new Error(validation.errors.join(" "));
 
@@ -130,7 +137,7 @@ export function drawAssignments(families: Family[], rng?: Rng): Assignment[] {
   );
 
   let receivers: Kid[] | null = null;
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const candidate = shuffle(kids, rng);
     if (isValid(kids, candidate)) {
       receivers = candidate;

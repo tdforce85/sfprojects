@@ -41,6 +41,7 @@ export function Organizer() {
   const [budget, setBudget] = useState("What you're comfortable with");
   const [date, setDate] = useState("Christmas Eve");
   const [rows, setRows] = useState<LinkRow[] | null>(null);
+  const [drawnKey, setDrawnKey] = useState("");
   const [status, setStatus] = useState("");
   const [hydrated, setHydrated] = useState(false);
 
@@ -70,6 +71,8 @@ export function Organizer() {
   }, [families, hydrated]);
 
   const validation = validateRoster(families);
+  const currentKey = JSON.stringify([families, budget, date]);
+  const stale = rows !== null && drawnKey !== currentKey;
   const counts = families.map(
     (f) => f.kids.filter((k) => k.trim().length > 0).length
   );
@@ -98,26 +101,31 @@ export function Organizer() {
   }
 
   function runDraw() {
-    // Assignments are consumed here and never stored in state.
-    const assignments = drawAssignments(families);
-    const familyOfKid = new Map<string, string>();
-    for (const f of families) {
-      for (const k of f.kids) familyOfKid.set(k.trim(), f.name.trim());
+    try {
+      // Assignments are consumed here and never stored in state.
+      const assignments = drawAssignments(families);
+      const familyOfKid = new Map<string, string>();
+      for (const f of families) {
+        for (const k of f.kids) familyOfKid.set(k.trim(), f.name.trim());
+      }
+      setRows(
+        assignments.map((a) => ({
+          giver: a.giver,
+          family: familyOfKid.get(a.giver) ?? "",
+          url: `${window.location.origin}/pollyanna/reveal#${encodePayload({
+            v: 1,
+            g: a.giver,
+            r: a.receiver,
+            b: budget.trim(),
+            d: date.trim(),
+          })}`,
+        }))
+      );
+      setDrawnKey(currentKey);
+      setStatus("Draw complete. Links are ready.");
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : "Draw failed.");
     }
-    setRows(
-      assignments.map((a) => ({
-        giver: a.giver,
-        family: familyOfKid.get(a.giver) ?? "",
-        url: `${window.location.origin}/pollyanna/reveal#${encodePayload({
-          v: 1,
-          g: a.giver,
-          r: a.receiver,
-          b: budget.trim(),
-          d: date.trim(),
-        })}`,
-      }))
-    );
-    setStatus("Draw complete. Links are ready.");
   }
 
   function redraw() {
@@ -285,6 +293,12 @@ export function Organizer() {
             Save these links now. If you lose them you&apos;ll need to redraw,
             which changes everyone&apos;s match.
           </p>
+          {stale && (
+            <p role="alert" className="text-amber-300 text-sm">
+              The roster or details changed since the draw. These links no
+              longer match; redraw to update them.
+            </p>
+          )}
           <ul className="space-y-2">
             {rows.map((r) => (
               <li
