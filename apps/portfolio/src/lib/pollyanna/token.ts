@@ -1,8 +1,11 @@
 import type { RevealPayload } from "./types";
 
 // Obfuscation, not encryption: it keeps names from being readable at a glance.
-// Links are built as `${origin}/pollyanna/reveal/#${token}`. The token lives in
+// Links are built as `${origin}/pollyanna/reveal#${token}`. The token lives in
 // the fragment so it is never sent to the server or written to logs.
+// `next build` emits reveal.html (no trailingSlash), which Cloudflare Pages
+// serves at /pollyanna/reveal without a redirect; the trailing-slash form would
+// 308 and could drop the fragment in some clients.
 const KEY = new TextEncoder().encode("pollyanna-v1");
 
 function xor(bytes: Uint8Array): Uint8Array {

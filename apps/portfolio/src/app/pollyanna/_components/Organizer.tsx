@@ -108,7 +108,7 @@ export function Organizer() {
       assignments.map((a) => ({
         giver: a.giver,
         family: familyOfKid.get(a.giver) ?? "",
-        url: `${window.location.origin}/pollyanna/reveal/#${encodePayload({
+        url: `${window.location.origin}/pollyanna/reveal#${encodePayload({
           v: 1,
           g: a.giver,
           r: a.receiver,
