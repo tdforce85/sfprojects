@@ -3,3 +3,11 @@
 
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
+
+/pollyanna/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+
+/pollyanna
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
