@@ -32,7 +32,15 @@ const CONFETTI = Array.from({ length: 28 }, (_, i) => {
   };
 });
 
-function Present({ lidOff }: { lidOff: boolean }) {
+interface PresentProps {
+  lidOff: boolean;
+}
+
+interface GiftProps {
+  payload: RevealPayload;
+}
+
+function Present({ lidOff }: PresentProps) {
   return (
     <svg viewBox="0 0 200 200" className="w-56 h-56 sm:w-72 sm:h-72" aria-hidden="true">
       <rect x="30" y="90" width="140" height="95" rx="6" fill="#b91c1c" />
@@ -48,7 +56,7 @@ function Present({ lidOff }: { lidOff: boolean }) {
   );
 }
 
-function Gift({ payload }: { payload: RevealPayload }) {
+function Gift({ payload }: GiftProps) {
   const [opened, setOpened] = useState(false);
 
   return (

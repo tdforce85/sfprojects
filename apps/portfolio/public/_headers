@@ -7,3 +7,7 @@
 /pollyanna/*
   X-Robots-Tag: noindex, nofollow
   Referrer-Policy: no-referrer
+
+/pollyanna
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer

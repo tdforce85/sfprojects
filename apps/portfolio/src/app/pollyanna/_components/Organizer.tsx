@@ -150,7 +150,7 @@ export function Organizer() {
     a.href = href;
     a.download = "pollyanna-links.txt";
     a.click();
-    URL.revokeObjectURL(href);
+    setTimeout(() => URL.revokeObjectURL(href), 1000);
   }
 
   return (
@@ -320,7 +320,12 @@ export function Organizer() {
             >
               Download backup (.txt)
             </button>
-            <button type="button" className="pollyanna-btn" onClick={redraw}>
+            <button
+              type="button"
+              className="pollyanna-btn"
+              disabled={!validation.ok}
+              onClick={redraw}
+            >
               Redraw
             </button>
           </div>
